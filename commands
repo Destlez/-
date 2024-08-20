@@ -1,0 +1,54 @@
+# 1. Создать двух пользователей
+user1 = User.objects.create_user('user1', 'user1@example.com', 'password1')
+user2 = User.objects.create_user('user2', 'user2@example.com', 'password2')
+
+# 2. Создать объекты модели Author, связанные с пользователями
+author1 = Author.objects.create(user=user1)
+author2 = Author.objects.create(user=user2)
+
+# 3. Добавить 4 категории в модель Category
+category1 = Category.objects.create(name='Спорт')
+category2 = Category.objects.create(name='Политика')
+category3 = Category.objects.create(name='Образование')
+category4 = Category.objects.create(name='Технологии')
+
+# 4. Добавить 2 статьи и 1 новость
+post1 = Post.objects.create(author=author1, post_type='article', title='Статья 1', text='Текст статьи 1')
+post2 = Post.objects.create(author=author1, post_type='article', title='Статья 2', text='Текст статьи 2')
+post3 = Post.objects.create(author=author2, post_type='news', title='Новость 1', text='Текст новости 1')
+
+# 5. Присвоить им категории
+PostCategory.objects.create(post=post1, category=category1)
+PostCategory.objects.create(post=post1, category=category2)
+PostCategory.objects.create(post=post2, category=category3)
+PostCategory.objects.create(post=post3, category=category4)
+
+# 6. Создать минимум 4 комментария к разным объектам модели Post
+comment1 = Comment.objects.create(post=post1, user=user2, text='Комментарий 1 к статье 1')
+comment2 = Comment.objects.create(post=post1, user=user1, text='Комментарий 2 к статье 1')
+comment3 = Comment.objects.create(post=post2, user=user2, text='Комментарий 1 к статье 2')
+comment4 = Comment.objects.create(post=post3, user=user1, text='Комментарий 1 к новости 1')
+
+# 7. Применение функций like() и dislike() для корректировки рейтингов
+post1.like()
+post1.like()
+post1.dislike()
+comment1.like()
+comment2.dislike()
+
+# 8. Обновить рейтинги пользователей
+author1.update_rating()
+author2.update_rating()
+
+# 9. Вывести username и рейтинг лучшего пользователя
+best_user = Author.objects.order_by('-rating').first()
+print(best_user.user.username, best_user.rating)
+
+# 10. Вывести дату добавления, username автора, рейтинг, заголовок и превью лучшей статьи
+best_post = Post.objects.order_by('-rating').first()
+print(best_post.created_at, best_post.author.user.username, best_post.rating, best_post.title, best_post.preview())
+
+# 11. Вывести все комментарии к этой статье
+for comment in best_post.comment_set.all():
+    print(comment.created_at, comment.user.username, comment.rating, comment.text)
+    
